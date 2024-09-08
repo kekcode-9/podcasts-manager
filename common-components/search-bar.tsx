@@ -12,7 +12,7 @@ export default function SearchBar() {
             className='shadow
             absolute
             w-[18.5rem] h-[6rem]
-            sm:w-[23.5rem] sm:h-[9rem]
+            sm:w-[32rem] sm:h-[9rem]
             mt-[12px]
             opacity-45
             bg-gradient-to-br  from-tropical-indigo from-0% to-chefchaouen-blue to-100%
@@ -24,7 +24,7 @@ export default function SearchBar() {
             className={`search-input
             relative z-10
             w-[18.5rem] h-[2.5rem]
-            sm:w-[23.5rem] sm:h-[3rem] 
+            sm:w-[32rem] sm:h-[3rem] 
             py-2 pl-4 pr-[48px]
             rounded-full
             bg-opacity-[0.7] bg-rich-black text-snow
