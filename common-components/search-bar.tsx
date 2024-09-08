@@ -31,7 +31,7 @@ export default function SearchBar() {
             focus:outline-none focus:bg-[#000000]
             transition-colors duration-300`}
         />
-        <div
+        <div 
             className='search-icon
             absolute top-[0.65rem] sm:top-[0.75rem] right-[1rem] z-20'
         >
