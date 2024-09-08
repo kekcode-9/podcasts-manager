@@ -11,7 +11,8 @@ export default function SearchBar() {
         <div 
             className='shadow
             absolute
-            w-[23.5rem] h-[9rem]
+            w-[18.5rem] h-[6rem]
+            sm:w-[23.5rem] sm:h-[9rem]
             mt-[12px]
             opacity-45
             bg-gradient-to-br  from-tropical-indigo from-0% to-chefchaouen-blue to-100%
@@ -22,7 +23,8 @@ export default function SearchBar() {
             placeholder='What do you seek ?'
             className={`search-input
             relative z-10
-            w-[23.5rem] h-[3rem] 
+            w-[18.5rem] h-[2.5rem]
+            sm:w-[23.5rem] sm:h-[3rem] 
             py-2 px-4
             rounded-full
             bg-opacity-[0.7] bg-rich-black text-snow
@@ -31,7 +33,7 @@ export default function SearchBar() {
         />
         <div
             className='search-icon
-            absolute top-[0.75rem] right-[1rem] z-20'
+            absolute top-[0.65rem] sm:top-[0.75rem] right-[1rem] z-20'
         >
             <Magnify/>
         </div>
