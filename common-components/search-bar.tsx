@@ -25,7 +25,7 @@ export default function SearchBar() {
             relative z-10
             w-[18.5rem] h-[2.5rem]
             sm:w-[23.5rem] sm:h-[3rem] 
-            py-2 px-4
+            py-2 pl-4 pr-[48px]
             rounded-full
             bg-opacity-[0.7] bg-rich-black text-snow
             focus:outline-none focus:bg-[#000000]
@@ -33,7 +33,8 @@ export default function SearchBar() {
         />
         <div 
             className='search-icon
-            absolute top-[0.65rem] sm:top-[0.75rem] right-[1rem] z-20'
+            absolute top-[0.15rem] sm:top-[0.25rem] right-[0.5rem] z-20
+            p-[0.5rem]'
         >
             <Magnify/>
         </div>
