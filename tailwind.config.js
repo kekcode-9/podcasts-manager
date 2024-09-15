@@ -18,7 +18,8 @@ module.exports = {
       'chefchaouen-blue': '#3c8eef',
       'rich-black': '#05031C',
       'snow': '#FFFBFE',
-      'claret': '#9C0D38'
+      'claret': '#9C0D38',
+      'davys-gray': '#56545e'
     }
   },
   plugins: [],

@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Magnify from '@/assets/icons/magnify-icon';
-export default function SearchBar() {
+
+type SearchBarPropTypes = {
+    onSearch: (searchString: string | undefined) => void
+}
+
+export default function SearchBar({
+    onSearch
+}: SearchBarPropTypes) {
+    const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className={`search-bar relative
+    <div className={`search-bar relative 
         w-fit h-fit
         rounded-full p-[2px]
         bg-gradient-to-br  from-tropical-indigo from-0% to-chefchaouen-blue to-100%`}
@@ -11,7 +19,7 @@ export default function SearchBar() {
         <div 
             className='shadow
             absolute
-            w-[18.5rem] h-[6rem]
+            w-[20rem] h-[6rem]
             sm:w-[32rem] sm:h-[9rem]
             mt-[12px]
             opacity-45
@@ -19,7 +27,12 @@ export default function SearchBar() {
             rounded-full blur-[100px]
             pointer-events-none'
         />
-        <input type='text'
+        <input type='text' ref={inputRef}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                    onSearch(inputRef.current?.value);
+                }
+            }}
             placeholder='What do you seek ?'
             className={`search-input
             relative z-10
@@ -34,7 +47,8 @@ export default function SearchBar() {
         <div 
             className='search-icon
             absolute top-[0.15rem] sm:top-[0.25rem] right-[0.5rem] z-20
-            p-[0.5rem]'
+            p-[0.5rem] cursor-pointer'
+            onClick={() => onSearch(inputRef.current?.value)}
         >
             <Magnify/>
         </div>
