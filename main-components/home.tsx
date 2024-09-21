@@ -42,10 +42,10 @@ function PodcastCard({
       className='podcast-card
       flex
       w-[20rem] sm:w-[34rem] h-fit
-      bg-gradient-to-br  from-[#e9dbfc] from-0% to-[#b0c4fa] to-100%
+      bg-gradient-to-br  from-[#ab73fa66] from-0% to-[#04133c] to-100%
       bg-opacity-40
-      text-rich-black
-      border-[1px] border-snow
+      text-snow
+      border-[1pxu] border-snowe
       rounded-md overflow-hidden'
     >
       <div
@@ -53,7 +53,7 @@ function PodcastCard({
         relative flex-shrink-0
         w-[5rem] sm:w-[7rem] 
         h-[5rem] sm:h-[7rem] 
-        border-r-2 border-snow'
+        border-r-2u border-snowe'
       >
         <Image ref={thumbRef}
           src={thumbnailLarge}
