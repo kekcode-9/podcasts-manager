@@ -9,15 +9,6 @@ import { dateFormatter } from '@/utils/utility-functions';
 import { PlayButton } from '@/common-components/cta';
 import { PodcastType } from '@/types';
 
-const DUMMY = {
-  name: "Dummy Name Dummy Artist Dummy Artist Dummy Artist Dummy Artist Dummy Artist Dummy Artist Dummy Artist",
-  artist: "Dummy Artist Dummy Artist Dummy Artist Dummy Artist Dummy Artist",
-  genre: "Dummy Genre Dummy Genre Dummy Genre Dummy Genre Dummy Genre Dummy Genre",
-  releaseDate: "2024-09-13T11:51:00Z",
-  duration: "45 min",
-  thumbnail: "https://via.placeholder.com/150/92c952"
-}
-
 /**
  * pass it a single podcast object
  */
@@ -86,7 +77,7 @@ function PodcastCard({
           className='artist-genre
           flex gap-2 items-center'
         >
-          <div className='max-w-full truncate'>{artistName}</div>
+          <div className='max-w-[10rem] truncate'>{artistName}</div>
           <div
             className='divider
             max-sm:hidden
@@ -115,13 +106,18 @@ export default function HomePage() {
     if (searchString !== undefined) {
       // make the api call
       const response = await fetch(
-        'http://podcasts-platform.us-east-1.elasticbeanstalk.com/podcasts/search/' + 
-        '?query=' + searchString.replaceAll(' ', '+'));
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/proxy/search/?` +
+        new URLSearchParams({
+          search: searchString.replaceAll(' ', '+')
+        }), {
+          method: 'GET'
+        }
+      )
       
-      if (!response.ok) {}
       // store the result is searchResults
       const result = await response.json();
       const collections = result.results as {[key: string]: any}[];
+      console.log('collections: ', collections);
       updateSearchResults(collections);
     }
   }
@@ -174,35 +170,11 @@ export default function HomePage() {
           >
             {
               searchResults.map((result, i) => {
-                const podcast = {
-                  collectionId: result.collectionId,
-                  collectionName: result.collectionName, // name of the entire podcast
-                  artistName: result.artistName,
-                  trackTimeMillis: result.trackTimeMillis,
-                  trackCount: result.trackCount, // number of episodes
-                  thumbnailSmall: result.artworkUrl100, // for small devices - artworkUrl100 in the api response
-                  thumbnailLarge: result.artworkUrl600, // for larger devices - artworkUrl600 in the api response
-                  genres: result.genres,
-                  primaryGenreName: result.primaryGenreName, // the genre to show on the podcast card
-                  collectionViewUrl: result.collectionViewUrl,
-                  releaseDate: result.releaseDate,
-                }
-                return <PodcastCard key={podcast.collectionId} podcast={podcast} />
+                result
+                return <PodcastCard key={result.collectionId} podcast={result as PodcastType} />
               })
             }
           </div> : <></>
-        }
-      </div>
-      <div
-        className='search-results-container
-        flex flex-col gap-2 sm:gap-8'
-      >
-        {
-          // new Array(10).fill('').map((item, i) => {
-          //   return (
-          //     <PodcastCard key={i} />
-          //   )
-          // })
         }
       </div>
     </div>
