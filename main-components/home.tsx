@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import SearchBar from '@/common-components/search-bar';
-import Sort from '@/assets/icons/sort-icon';
+import Dropdown from '@/common-components/dropdown';
 import Filter from '@/assets/icons/filter-icon';
 // to be moved to PodcastCard component file later
 import { dateFormatter } from '@/utils/utility-functions';
@@ -41,7 +41,7 @@ function PodcastCard({
     <div
       className='podcast-card
       flex
-      w-[20rem] sm:w-[34rem] h-fit
+      w-[20rem] sm:w-[32rem] h-fit
       bg-gradient-to-br  from-[#ab73fa66] from-0% to-[#04133c] to-100%
       bg-opacity-40
       text-snow
@@ -72,19 +72,19 @@ function PodcastCard({
         px-2 sm:px-4
         max-sm:text-sm'
       >
-        <div className='w-[10rem] sm:w-[18rem] truncate'>{collectionName}</div>
+        <div className='w-[10rem] sm:w-[16rem] truncate'>{collectionName}</div>
         <div
           className='artist-genre
           flex gap-2 items-center'
         >
-          <div className='max-w-[10rem] truncate'>{artistName}</div>
+          <div className='max-w-[8rem] truncate'>{artistName}</div>
           <div
             className='divider
             max-sm:hidden
             w-2 h-2 
             rounded-full bg-davys-gray'
           />
-          <div className='max-sm:hidden min-w-[8rem] max-w-[10rem] truncate'>{primaryGenreName}</div>
+          <div className='max-sm:hidden min-w-[8rem] max-w-[8rem] truncate'>{primaryGenreName}</div>
         </div>
         <div className='max-sm:hidden'>{releaseDateOnly}</div>
       </div>
@@ -108,7 +108,8 @@ export default function HomePage() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}api/proxy/search/?` +
         new URLSearchParams({
-          search: searchString.replaceAll(' ', '+')
+          search: searchString.replaceAll(' ', '+'),
+          ordering: 'oldest'
         }), {
           method: 'GET'
         }
@@ -131,7 +132,7 @@ export default function HomePage() {
     >
       <div 
           className='search-bar-container
-          sticky top-[2rem] sm:top-[4rem] z-[999] m-auto'
+          sticky top-[2rem] sm:top-[4rem] z-[888] m-auto'
       >
           <SearchBar onSearch={onSearch} />
       </div>
@@ -142,22 +143,27 @@ export default function HomePage() {
         {
           searchResults?.length ?
           <div
-            className='sort-filter
+            className='sort-filter sticky top-[6rem] sm:top-[9rem] z-[999]
             flex items-center justify-end gap-4 
             w-full h-fit
             text-snow'
           >
-            <div 
-              className='sort-icon-wrapper
-              flex items-center gap-1'
+            <div
+              className='
+              flex items-center gap-4
+              w-fit h-fit
+              py-2 px-3 bg-[#000000] rounded-full'
             >
-              <Sort/> <span>Sort</span>
-            </div>
-            <div 
-              className='filter-icon-wrapper
-              flex items-center gap-1'
-            >
-              <Filter/> <span>Filter</span>
+              <Dropdown
+                onSelect={() => {}}
+                dropdownList={[]}
+              />
+              <div 
+                className='filter-icon-wrapper
+                flex items-center gap-1'
+              >
+                <Filter/> <span>Filter</span>
+              </div>
             </div>
           </div> : <></>
         }
