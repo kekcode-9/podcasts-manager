@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import SearchBar from '@/common-components/search-bar';
 import Dropdown from '@/common-components/dropdown';
@@ -102,13 +103,18 @@ function PodcastCard({
 export default function HomePage() {
   const [searchResults, updateSearchResults] = useState<{[key: string]: any}[]>();
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const onSearch = async (searchString: string | undefined) => {
     if (searchString !== undefined) {
       // make the api call
+      const searchParam = searchString.replaceAll(' ', '+');
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}api/proxy/search/?` +
         new URLSearchParams({
-          search: searchString.replaceAll(' ', '+'),
+          search: searchParam,
           ordering: 'oldest'
         }), {
           method: 'GET'
@@ -118,10 +124,20 @@ export default function HomePage() {
       // store the result is searchResults
       const result = await response.json();
       const collections = result.results as {[key: string]: any}[];
+      router.push(`?search=${searchParam}`);
       console.log('collections: ', collections);
       updateSearchResults(collections);
     }
   }
+
+  useEffect(() => {
+    const query = searchParams.get("search");
+    
+    if (query) {
+      onSearch(query);
+    }
+
+  }, [searchParams])
 
   return (
     <div className='home-page
