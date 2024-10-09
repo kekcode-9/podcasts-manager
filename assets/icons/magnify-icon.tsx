@@ -22,8 +22,8 @@ export default function Magnify() {
           y2="21"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#8528FF" />
-          <stop offset="1" stop-color="#3C8EEF" />
+          <stop stopColor="#8528FF" />
+          <stop offset="1" stopColor="#3C8EEF" />
         </linearGradient>
       </defs>
     </svg>

@@ -11,3 +11,14 @@ export type PodcastType = {
     collectionViewUrl: string,
     releaseDate: string,
 }
+
+export type EpisodeType = {
+    trackId: number,
+    trackName: string,
+    trackTimeMillis: number,
+    episodeUrl: string,
+    releaseDate: string,
+    description: string,
+    thumbnail: string,
+    kind: string
+}

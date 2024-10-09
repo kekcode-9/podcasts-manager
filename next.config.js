@@ -8,6 +8,11 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'via.placeholder.com',
                 pathname: '/**'
+            },
+            {
+                protocol: 'https',
+                hostname: 'is1-ssl.mzstatic.com',
+                pathname: '/**'
             }
         ]
     }
