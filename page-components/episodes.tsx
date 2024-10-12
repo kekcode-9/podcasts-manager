@@ -75,7 +75,7 @@ function AudioPlayer({ trackId, episodeUrl }: AudioPlayerPropsType) {
       controls
       ref={audioRef}
       className="relative
-      w-full 
+      w-full h-8
       rounded-full
       bg-transparent"
       initial={{
@@ -212,12 +212,30 @@ function PlayerContainer({
       bg-gradient-to-b from-[#9C0D38D0] from-0% to-rich-black to-100%
       backdrop-blur-sm"
     >
+      {(podcast || episode) && (
+        <div
+          className="expand-collapse
+          md:hidden flex items-center justify-end
+          w-full
+          pr-4 pt-4"
+        >
+          <div
+            className="flex items-center justify-center
+            w-fit h-fit
+            "
+            onClick={() => {
+              toggleIsCollapsed(!isCollapsed);
+            }}
+          >
+            {isCollapsed ? <Expand /> : <Collapse />}
+          </div>
+        </div>
+      )}
       {podcast && (
         <div
           className={`podcast-container
             flex ${isCollapsed ? "flex-row" : "flex-col"} sm:flex-col 
             ${isCollapsed ? "items-start" : "items-center"} gap-3 sm:gap-8
-            pointer-events-auto
             p-4 sm:p-8`}
         >
           <div
@@ -274,8 +292,9 @@ function PlayerContainer({
       {episode && (
         <div
           className={`curr-episode-container
-          flex ${isCollapsed ? "flex-row" : "flex-col"} sm:flex-col 
+          flex flex-col 
           ${isCollapsed ? "items-start gap-2" : "items-center gap-3"} sm:gap-8
+          w-full
           ${isCollapsed ? "p-3" : "p-4"} sm:p-8`}
         >
           <div
@@ -299,6 +318,7 @@ function PlayerContainer({
             flex ${isCollapsed ? "flex-col-reverse" : "flex-col"} sm:flex-col
             ${isCollapsed ? "items-start" : "items-center"} sm:items-center
             ${isCollapsed ? "gap-2" : "gap-3"}
+            w-full
             sm:gap-8
             `}
           >
@@ -333,24 +353,6 @@ function PlayerContainer({
                 </p>
               )}
             </div>
-          </div>
-        </div>
-      )}
-      {(podcast || episode) && (
-        <div
-          className="expand-collapse
-          md:hidden flex items-center justify-center
-          w-full"
-        >
-          <div
-            className="flex items-center justify-center
-            w-fit h-fit
-            p-2 border border-snow rounded-full"
-            onClick={() => {
-              toggleIsCollapsed(!isCollapsed);
-            }}
-          >
-            {isCollapsed ? <Expand /> : <Collapse />}
           </div>
         </div>
       )}
