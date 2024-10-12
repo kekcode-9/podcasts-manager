@@ -217,6 +217,7 @@ function PlayerContainer({
           className={`podcast-container
             flex ${isCollapsed ? "flex-row" : "flex-col"} sm:flex-col 
             ${isCollapsed ? "items-start" : "items-center"} gap-3 sm:gap-8
+            pointer-events-auto
             p-4 sm:p-8`}
         >
           <div
@@ -326,7 +327,7 @@ function PlayerContainer({
               {!isCollapsed && (
                 <p
                   className="description
-                  text-base text-snow-low-opacity"
+                  text-sm sm:text-base text-snow-low-opacity"
                 >
                   {episode.description}
                 </p>
