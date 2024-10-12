@@ -38,7 +38,7 @@ export function PlayButton({
             rounded-full 
             sm:border-2 sm:border-snow
             bg-rich-black cursor-pointer 
-            hover:bg-gradient-to-br  from-tropical-indigo from-0% to-chefchaouen-blue to-100%
+            hover:bg-gradient-to-br  from-tropical-indigo from-0% to-claret to-100%
             hover:border-rich-black 
             transition-all duration-150 hover:transition-all hover:duration-150'
         >

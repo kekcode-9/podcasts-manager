@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
@@ -21,17 +21,34 @@ type AudioPlayerPropsType = {
 }
 
 function AudioPlayer({ trackId, episodeUrl }: AudioPlayerPropsType) {
+
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    console.log('AudioPlayer rendered')
+  }, [])
+
+  const handlePlayPause = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.style.pointerEvents = "none";
+
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.style.pointerEvents = "auto";
+          audioRef.current.style.userSelect = "none";
+        }
+      }, 1000)
+    }
+  }, [])
 
   return (
     <motion.audio
       controls
       ref={audioRef}
-      className="relative z-30
+      className="relative
       w-full 
       rounded-full
       bg-transparent"
-      onCanPlay={() => audioRef.current?.play()}
       initial={{
         opacity: 0,
       }}
@@ -42,6 +59,9 @@ function AudioPlayer({ trackId, episodeUrl }: AudioPlayerPropsType) {
           duration: 0.5,
         },
       }}
+      onCanPlay={() => audioRef.current?.play()}
+      onPlay={handlePlayPause}
+      onPause={handlePlayPause}
     >
       <source src={episodeUrl} type="audio/mp3" />
     </motion.audio>
@@ -66,13 +86,16 @@ function EpisodeCard({ episode, onPlay, isCurrent, children }: EpisodeCardPropsT
   } = episode;
 
   const releaseDateOnly = dateFormatter(releaseDate);
-
   return (
     <div
-      className="episode-card
+      className={`episode-card
       flex flex-col gap-4
-      w-[80vw] sm:w-[80vw] md:w-[72vw] lg:w-[32rem] xl:w-[48rem] h-fit
-      text-snow"
+      w-[100vw] sm:w-[80vw] md:w-[72vw] lg:w-[min(50vw,32rem)] xl:w-[min(50vw,48rem)] 
+      h-fit
+      p-3 sm:p-2 
+      sm:rounded-md
+      ${isCurrent && 'bg-gradient-to-r from-[#9C0D38D0] from-0% to-rich-black to-100%'}
+      text-snow`}
     >
       <div
         className="episode-data
@@ -83,6 +106,7 @@ function EpisodeCard({ episode, onPlay, isCurrent, children }: EpisodeCardPropsT
           flex-shrink-0
           w-[5rem] sm:w-[7rem] 
           h-[5rem] sm:h-[7rem] 
+          rounded-md overflow-hidden
           "
         >
           <Image
@@ -95,23 +119,23 @@ function EpisodeCard({ episode, onPlay, isCurrent, children }: EpisodeCardPropsT
         </div>
         <div
           className="episode-meta-data
-          flex flex-col justify-center gap-2 sm:gap-1
+          flex flex-col max-sm:justify-start justify-center gap-2 sm:gap-1 shrink
           w-full 
           px-2 sm:px-4
           max-sm:text-sm"
         >
           <div className="line-clamp-1 font-bold">{trackName}</div>
-          <div className="max-sm:hidden text-snow-low-opacity font-semibold">
+          <div className="text-snow-low-opacity font-semibold">
             {releaseDateOnly}
           </div>
-          <div className="w-full line-clamp-2 text-snow-low-opacity">
+          <div className="max-sm:hidden w-full line-clamp-2 text-snow-low-opacity">
             {description}
           </div>
         </div>
         {!isCurrent && (
           <div
             className="play-button-wrapper
-            flex items-center justify-center 
+            flex sm:items-center justify-center 
             p-2 sm:p-4"
           >
             <PlayButton onPlay={() => {
@@ -174,9 +198,18 @@ function PlayerContainer({ podcast, episode }: PlayerContainerPropsType) {
    * player (extra)
    * description (extra)
    */
+  // hover:bg-gradient-to-br  from-tropical-indigo from-0% to-chefchaouen-blue to-100%
   return (
-    <div className="player-container">
-      <div className="cover-image"></div>
+    <div 
+      className="player-container
+      max-lg:sticky max-lg:top-0 max-lg:z-20
+      w-full lg:w-[70vw]
+      h-[300px] lg:h-screen
+      bg-gradient-to-b from-[#9C0D38D0] from-0% to-rich-black to-100%
+      backdrop-blur-sm"
+    >
+      <div className="cover-image"
+      ></div>
       <div className="header">
         {/**
          * contains podcast name, artist name and track count for podcast
@@ -227,51 +260,62 @@ export default function Episodes() {
   // fetch data from collectionId whenever it changes and store in episodes
   return (
     <div
-      className="episodes
-      relative
-      flex flex-col items-center gap-[2rem] sm:gap-[3rem]
-      w-screen max-sm:px-[2rem] max-sm:py-[2rem] sm:p-[4rem]
-      bg-rich-black"
+      className="episodes-page-wrapper
+      flex max-lg:flex-col
+      w-screen"
     >
-      {/**
-       * show the podcase thumbnail, collection name and artist name
-       */}
-      <div></div>
+      <PlayerContainer />
       <div
-        className="episodes-header
-        w-[80vw] sm:w-[80vw] md:w-[72vw] lg:w-[32rem] xl:w-[48rem]
-        text-snow text-xl font-bold"
+        className="episodes
+        relative
+        flex flex-col items-center gap-[2rem] sm:gap-[3rem]
+        w-screen lg:w-full 
+        lg:h-screen lg:overflow-scroll
+        overflow-hidden
+        max-sm:px-[2rem] max-sm:py-[2rem] sm:p-[4rem]
+        bg-rich-black"
       >
-        Episodes
+        {/**
+         * show the podcase thumbnail, collection name and artist name
+         */}
+        <div></div>
+        <div
+          className="episodes-header
+          w-[100vw] sm:w-[80vw] md:w-[72vw] lg:w-[min(50vw,32rem)] xl:w-[min(50vw,48rem)]
+          max-sm:p-3
+          text-snow text-xl font-bold"
+        >
+          Episodes
+        </div>
+        {episodes?.length &&
+          episodes.map((ep, i) => {
+            if (ep.kind === "podcast-episode") {
+              const episode: EpisodeType = {
+                trackId: ep.trackId,
+                trackName: ep.trackName,
+                trackTimeMillis: ep.trackTimeMillis,
+                episodeUrl: ep.episodeUrl,
+                releaseDate: ep.releaseDate,
+                description: ep.description,
+                thumbnail: ep.thumbnail,
+                kind: ep.kind,
+              };
+              return (
+                <EpisodeCard
+                  key={episode.trackId}
+                  episode={episode}
+                  isCurrent={nowPlaying === ep.trackId}
+                  onPlay={() => setNowPlaying(ep.trackId)}
+                >
+                  {
+                    nowPlaying === ep.trackId ?
+                    <AudioPlayer trackId={ep.trackId} episodeUrl={ep.episodeUrl} /> : <></>
+                  }
+                </EpisodeCard>
+              );
+            }
+          })}
       </div>
-      {episodes?.length &&
-        episodes.map((ep, i) => {
-          if (/*ep.kind === "podcast-episode"*/ ep.trackId) {
-            const episode: EpisodeType = {
-              trackId: ep.trackId,
-              trackName: ep.trackName,
-              trackTimeMillis: ep.trackTimeMillis,
-              episodeUrl: ep.episodeUrl,
-              releaseDate: ep.releaseDate,
-              description: ep.description,
-              thumbnail: ep.thumbnail,
-              kind: ep.kind,
-            };
-            return (
-              <EpisodeCard
-                key={episode.trackId}
-                episode={episode}
-                isCurrent={nowPlaying === ep.trackId}
-                onPlay={() => setNowPlaying(ep.trackId)}
-              >
-                {
-                  nowPlaying === ep.trackId ?
-                  <AudioPlayer trackId={ep.trackId} episodeUrl={ep.episodeUrl} /> : <></>
-                }
-              </EpisodeCard>
-            );
-          }
-        })}
     </div>
   );
 }
