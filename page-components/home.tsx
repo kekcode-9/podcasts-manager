@@ -11,6 +11,7 @@ import { PlayButton } from "@/common-components/cta";
 import { PodcastType } from "@/types";
 import ROUTE_CONSTANTS from "@/constants/routeConstants";
 import API_CONSTANTS from "@/constants/apiConstants";
+import Loaders from "@/common-components/loaders";
 
 const { ROUTES, QUERY_PARAMS_FRONTEND } = ROUTE_CONSTANTS;
 const { EPISODES } = ROUTES;
@@ -39,12 +40,6 @@ function PodcastCard({ podcast }: PodcastCardPropsType) {
   const router = useRouter();
 
   const thumbRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (thumbRef.current) {
-      // animate entry by turning opacity up
-    }
-  }, []);
 
   return (
     <div
@@ -118,12 +113,14 @@ function PodcastCard({ podcast }: PodcastCardPropsType) {
 export default function Home() {
   const [searchResults, updateSearchResults] =
     useState<{ [key: string]: any }[]>();
+  const [showLoader, toggleShowLoader] = useState<boolean>(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const onSearch = async (searchString: string | undefined) => {
     if (searchString !== undefined) {
+      toggleShowLoader(true);
       // make the api call
       const searchParam = searchString.replaceAll(" ", "+");
 
@@ -196,7 +193,21 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <></>
+          showLoader && (
+            <div
+              className="sticky top-[6rem] sm:top-[9rem] z-[999]
+            flex items-center justify-end gap-4 
+            w-full h-[40px]"
+            >
+              <Loaders
+                loader={{
+                  loaderType: "text",
+                  lineHeight: "h-[32px]",
+                  lineWidth: "w-[160px]",
+                }}
+              />
+            </div>
+          )
         )}
         {
           // if searchResults is not empty, display them here
@@ -216,7 +227,24 @@ export default function Home() {
               })}
             </div>
           ) : (
-            <></>
+            showLoader && (
+              <div
+                className="search-results
+              flex flex-col gap-4 sm:gap-8"
+              >
+                {new Array(10).fill("").map((item, i) => {
+                  return (
+                    <Loaders
+                      loader={{
+                        loaderType: "card",
+                        classNames:
+                          "w-[20rem] sm:w-[32rem] h-[5rem] sm:h-[7rem] rounded-md",
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            )
           )
         }
       </div>

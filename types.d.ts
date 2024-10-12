@@ -22,3 +22,12 @@ export type EpisodeType = {
     thumbnail: string,
     kind: string
 }
+
+export type PodcastShortType = {
+    artistName: string,
+    collectionName: string,
+    thumbnail: string,
+    collectionId: number,
+    kind: string,
+    trackCount: number
+}
