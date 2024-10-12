@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { dateFormatter } from "@/utils/utility-functions";
 import ROUTE_CONSTANTS from "@/constants/routeConstants";
@@ -14,11 +15,47 @@ const { COLLECTION_ID } = QUERY_PARAMS_FRONTEND;
 const { PROXY_API_ROUTES } = API_CONSTANTS;
 const { PROXY_EPISODES } = PROXY_API_ROUTES;
 
+type AudioPlayerPropsType = {
+  trackId: Number,
+  episodeUrl: string
+}
+
+function AudioPlayer({ trackId, episodeUrl }: AudioPlayerPropsType) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  return (
+    <motion.audio
+      controls
+      ref={audioRef}
+      className="relative z-30
+      w-full 
+      rounded-full
+      bg-transparent"
+      onCanPlay={() => audioRef.current?.play()}
+      initial={{
+        opacity: 0,
+      }}
+      animate={{
+        opacity: 1,
+        transition: {
+          delay: 0.3,
+          duration: 0.5,
+        },
+      }}
+    >
+      <source src={episodeUrl} type="audio/mp3" />
+    </motion.audio>
+  )
+}
+
 type EpisodeCardPropsType = {
-  episode: EpisodeType;
+  episode: EpisodeType,
+  onPlay: () => void,
+  children: React.ReactElement,
+  isCurrent: boolean
 };
 
-function EpisodeCard({ episode }: EpisodeCardPropsType) {
+function EpisodeCard({ episode, onPlay, isCurrent, children }: EpisodeCardPropsType) {
   const {
     trackName,
     trackTimeMillis,
@@ -27,11 +64,6 @@ function EpisodeCard({ episode }: EpisodeCardPropsType) {
     description,
     thumbnail,
   } = episode;
-
-  const [showPlayer, toggleShowPlayer] = useState<boolean>(false);
-  const [isPlaying, toggleIsPlaying] = useState<boolean>(false);
-
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const releaseDateOnly = dateFormatter(releaseDate);
 
@@ -76,59 +108,55 @@ function EpisodeCard({ episode }: EpisodeCardPropsType) {
             {description}
           </div>
         </div>
-        {
-          !showPlayer &&
+        {!isCurrent && (
           <div
             className="play-button-wrapper
             flex items-center justify-center 
             p-2 sm:p-4"
-            onClick={() => {
-              toggleShowPlayer(!showPlayer);
-            }}
           >
-            <PlayButton onPlay={() => {}} />
+            <PlayButton onPlay={() => {
+                onPlay();
+              }} 
+            />
           </div>
-        }
+        )}
       </div>
-      {
-        showPlayer &&
-        <div
+      {isCurrent && (
+        <motion.div
           className="player"
+          initial={{
+            height: "0px",
+          }}
+          animate={{
+            height: "fit-content",
+            transition: {
+              duration: 0.3,
+            },
+          }}
         >
-          <audio controls ref={audioRef} 
-            className="relative z-30
-            w-full 
-            rounded-full
-            bg-transparent"
-            onCanPlay={() => audioRef.current?.play()}
-          >
-            <source src={episodeUrl} type="audio/mp3"/>
-          </audio>
-        </div>
-      }
+          {children}
+        </motion.div>
+      )}
     </div>
   );
 }
 
 type PlayerContainerPropsType = {
   podcast?: {
-    collectionName: string,
-    thumbnail: string,
-    artistName: string,
-    trackCount: number
-  },
-  episode?: EpisodeType
-}
+    collectionName: string;
+    thumbnail: string;
+    artistName: string;
+    trackCount: number;
+  };
+  episode?: EpisodeType;
+};
 
 /**
  * When not playing any episode, this container shows info on the podcast.
  * When an episode is selected to play, this container shows the detail of the episode
  * and the player feature
  */
-function PlayerContainer({
-  podcast,
-  episode
-}: PlayerContainerPropsType) {
+function PlayerContainer({ podcast, episode }: PlayerContainerPropsType) {
   // only for screens <=1024px (max-lg:)
   const [isCollapsed, toggleIsCollapsed] = useState<Boolean>(false);
 
@@ -138,7 +166,7 @@ function PlayerContainer({
    * podcast name
    * artist name (not in episode)
    * episodes count (maybe) (not in episode)
-   * 
+   *
    * When passed episode, it shows:
    * thumbnail
    * episode name
@@ -148,35 +176,26 @@ function PlayerContainer({
    */
   return (
     <div className="player-container">
-      <div
-        className="cover-image"
-      ></div>
-      <div
-        className="header"
-      >
+      <div className="cover-image"></div>
+      <div className="header">
         {/**
          * contains podcast name, artist name and track count for podcast
          * contains episode name and date for episode
          */}
       </div>
-      {
-        episode &&
+      {episode && (
         <>
-          <div
-            className="player"
-          >
-          </div>
-          <div
-            className="episode-description"
-          ></div>
+          <div className="player"></div>
+          <div className="episode-description"></div>
         </>
-      }
+      )}
     </div>
-  )
+  );
 }
 
 export default function Episodes() {
   const [episodes, updateEpisodes] = useState<any[]>();
+  const [nowPlaying, setNowPlaying] = useState<Number>();
 
   const searchParams = useSearchParams();
 
@@ -218,7 +237,7 @@ export default function Episodes() {
        * show the podcase thumbnail, collection name and artist name
        */}
       <div></div>
-      <div 
+      <div
         className="episodes-header
         w-[80vw] sm:w-[80vw] md:w-[72vw] lg:w-[32rem] xl:w-[48rem]
         text-snow text-xl font-bold"
@@ -238,7 +257,19 @@ export default function Episodes() {
               thumbnail: ep.thumbnail,
               kind: ep.kind,
             };
-            return <EpisodeCard key={episode.trackId} episode={episode} />;
+            return (
+              <EpisodeCard
+                key={episode.trackId}
+                episode={episode}
+                isCurrent={nowPlaying === ep.trackId}
+                onPlay={() => setNowPlaying(ep.trackId)}
+              >
+                {
+                  nowPlaying === ep.trackId ?
+                  <AudioPlayer trackId={ep.trackId} episodeUrl={ep.episodeUrl} /> : <></>
+                }
+              </EpisodeCard>
+            );
           }
         })}
     </div>
