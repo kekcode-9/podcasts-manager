@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { dateFormatter } from "@/utils/utility-functions";
@@ -28,52 +28,84 @@ function EpisodeCard({ episode }: EpisodeCardPropsType) {
     thumbnail,
   } = episode;
 
+  const [showPlayer, toggleShowPlayer] = useState<boolean>(false);
+  const [isPlaying, toggleIsPlaying] = useState<boolean>(false);
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
   const releaseDateOnly = dateFormatter(releaseDate);
 
   return (
     <div
       className="episode-card
-      flex
+      flex flex-col gap-4
       w-[80vw] sm:w-[80vw] md:w-[72vw] lg:w-[32rem] xl:w-[48rem] h-fit
       text-snow"
     >
       <div
-        className="thumbnail-wrapper relative
-        flex-shrink-0
-        w-[5rem] sm:w-[7rem] 
-        h-[5rem] sm:h-[7rem] 
-        "
+        className="episode-data
+        flex w-full"
       >
-        <Image
-          src={thumbnail}
-          alt={trackName}
-          quality={100}
-          loading="lazy"
-          layout="fill"
-        />
-      </div>
-      <div
-        className="episode-meta-data
-        flex flex-col justify-center gap-2 sm:gap-1
-        w-full 
-        px-2 sm:px-4
-        max-sm:text-sm"
-      >
-        <div className="line-clamp-1 font-bold">{trackName}</div>
-        <div className="max-sm:hidden text-snow-low-opacity font-semibold">
-          {releaseDateOnly}
+        <div
+          className="thumbnail-wrapper relative
+          flex-shrink-0
+          w-[5rem] sm:w-[7rem] 
+          h-[5rem] sm:h-[7rem] 
+          "
+        >
+          <Image
+            src={thumbnail}
+            alt={trackName}
+            quality={100}
+            loading="lazy"
+            layout="fill"
+          />
         </div>
-        <div className="w-full line-clamp-2 text-snow-low-opacity">
-          {description}
+        <div
+          className="episode-meta-data
+          flex flex-col justify-center gap-2 sm:gap-1
+          w-full 
+          px-2 sm:px-4
+          max-sm:text-sm"
+        >
+          <div className="line-clamp-1 font-bold">{trackName}</div>
+          <div className="max-sm:hidden text-snow-low-opacity font-semibold">
+            {releaseDateOnly}
+          </div>
+          <div className="w-full line-clamp-2 text-snow-low-opacity">
+            {description}
+          </div>
         </div>
+        {
+          !showPlayer &&
+          <div
+            className="play-button-wrapper
+            flex items-center justify-center 
+            p-2 sm:p-4"
+            onClick={() => {
+              toggleShowPlayer(!showPlayer);
+            }}
+          >
+            <PlayButton onPlay={() => {}} />
+          </div>
+        }
       </div>
-      <div
-        className="play-button-wrapper
-        flex items-center justify-center 
-        p-2 sm:p-4"
-      >
-        <PlayButton onPlay={() => {}} />
-      </div>
+      {
+        showPlayer &&
+        <div
+          className="player"
+        >
+          <audio controls ref={audioRef} 
+            className="relative z-30
+            w-full 
+            rounded-full
+            bg-transparent"
+            onCanPlay={() => audioRef.current?.play()}
+          >
+            <source src={episodeUrl} type="audio/mp3"/>
+          </audio>
+        </div>
+      }
     </div>
   );
 }
@@ -97,6 +129,9 @@ function PlayerContainer({
   podcast,
   episode
 }: PlayerContainerPropsType) {
+  // only for screens <=1024px (max-lg:)
+  const [isCollapsed, toggleIsCollapsed] = useState<Boolean>(false);
+
   /**
    * when passed podcast, it shows:
    * thumbnail
