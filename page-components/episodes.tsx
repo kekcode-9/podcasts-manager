@@ -215,6 +215,7 @@ function PlayerContainer({
       {(podcast || episode) && (
         <div
           className="expand-collapse
+          absolute top-0 left-0
           md:hidden flex items-center justify-end
           w-full
           pr-4 pt-4"
