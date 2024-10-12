@@ -381,7 +381,7 @@ function PlayerContainer({
             {
               new Array(5).fill('').map((item, i) => {
                 return (
-                  <Loaders 
+                  <Loaders key={i}
                     loader={{
                       loaderType: "text",
                       lineHeight: "h-[6px]",
@@ -498,7 +498,7 @@ export default function Episodes() {
             })
           : new Array(10).fill("").map((item, i) => {
               return (
-                <Loaders
+                <Loaders key={i}
                   loader={{
                     loaderType: "card",
                     classNames: EPISODE_CARD_OUTER,
