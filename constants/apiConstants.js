@@ -11,8 +11,26 @@ const API_CONSTANTS = {
     },
     QUERY_PARAMS: {
         QUERY: "query",
-        ORDERING: "ordering",
-        COLLECTION_ID: "collectionId"
+        ORDERING: {
+            key: "ordering",
+            values: {
+                NEWEST: "newest",
+                OLDEST: "oldest",
+                MOST_TRACKS: "mostTracks"
+            }
+        },
+        COLLECTION_ID: "collectionId",
+        ATTRIBUTES: {
+            key: "attr",
+            values: {
+                TITLE_TERM: "titleTerm",
+                LANGUAGE_TERM: "languageTerm",
+                AUTHOR_TERM: "authorTerm",
+                GENRE_INDEX: "genreIndex",
+                ARTIST_TERM: "artistTerm",
+                RATING_INDEX: "ratingIndex"
+            }
+        }
     }
 }
 

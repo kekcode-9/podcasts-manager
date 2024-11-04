@@ -9,3 +9,23 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+
+.episodes::-webkit-scrollbar {
+  width: 0;  /* Hides vertical scrollbar */
+  height: 0; /* Hides horizontal scrollbar */
+}
+
+.episodes {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Change background color of audio controls in WebKit-based browsers */
+audio::-webkit-media-controls-panel {
+  background: linear-gradient(to right, rgb(110, 110, 161), rgb(225, 170, 225)) /* Semi-transparent black rgba(61, 9, 121, 0.7);*/
+}
+
+/* Tint all controls for WebKit browsers */
+audio::-webkit-media-controls {
+  filter: brightness(0.8) saturate(1.5); /* Adjust brightness and saturation */
+}

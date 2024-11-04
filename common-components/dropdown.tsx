@@ -4,11 +4,13 @@ import Sort from "@/assets/icons/sort-icon";
 type DropdownPropsType = {
   onSelect: () => void;
   dropdownList: string[];
+  children: React.ReactNode
 };
 
 export default function Dropdown({
   onSelect,
   dropdownList,
+  children
 }: DropdownPropsType) {
   const [showList, toggleShowList] = useState<boolean>(false);
 
@@ -23,7 +25,7 @@ export default function Dropdown({
         text-snow cursor-pointer"
       onClick={() => toggleShowList(!showList)}
     >
-      <Sort /> <span>Sort</span>
+      {children}
     </div>
   );
 }

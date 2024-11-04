@@ -201,21 +201,39 @@ function PlayerContainer({
 }: PlayerContainerPropsType) {
   // only for screens <=1024px (max-lg:)
   const [isCollapsed, toggleIsCollapsed] = useState<Boolean>(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const handleImageLoad = useCallback(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    const img = imgRef.current;
+
+    if (canvas && context && img) {
+      // Draw the image onto the canvas
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Apply a dark tint overlay
+      context.fillStyle = 'rgba(0, 0, 0, 0.5)'; // Adjust the opacity as needed
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  }, [])
 
   return (
     <div
-      className="player-container
+      className={`player-container
       max-lg:sticky max-lg:top-0 max-lg:z-20
       w-full lg:w-[70vw]
       h-fit lg:h-screen
       pb-4 sm:pb-8
-      bg-gradient-to-b from-[#9C0D38D0] from-0% to-rich-black to-100%
-      backdrop-blur-sm"
+      ${podcast && "bg-gradient-to-b from-[#9C0D38D0] from-0% to-rich-black to-100%"}
+      backdrop-blur-3xl`}
     >
       {(podcast || episode) && (
         <div
           className="expand-collapse
-          absolute top-0 left-0
+          absolute top-0 left-0 z-10
           md:hidden flex items-center justify-end
           w-full
           pr-4 pt-4"
@@ -298,15 +316,20 @@ function PlayerContainer({
           w-full
           ${isCollapsed ? "p-3" : "p-4"} sm:p-8`}
         >
+          <canvas ref={canvasRef} width={2} height={2}
+            className="absolute top-0 left-0 z-0
+            w-full h-full blur-[256px]"
+          ></canvas>
           <div
             className={`episode-thumbnail
-            relative shrink-0
+            relative z-10 shrink-0
             ${isCollapsed ? "w-[5rem] h-[5rem]" : "w-[12rem] h-[12rem]"}
             md:w-[15rem] md:h-[15rem]
             lg:w-[20rem] lg:h-[20rem]
             rounded-md overflow-hidden`}
           >
-            <Image
+            <Image onLoad={(src) => handleImageLoad()}
+              ref={imgRef}
               src={episode.thumbnail}
               alt={episode.trackName}
               quality={100}
@@ -315,7 +338,7 @@ function PlayerContainer({
             />
           </div>
           <div
-            className={`wrapper
+            className={`wrapper relative
             flex ${isCollapsed ? "flex-col-reverse" : "flex-col"} sm:flex-col
             ${isCollapsed ? "items-start" : "items-center"} sm:items-center
             ${isCollapsed ? "gap-2" : "gap-3"}
@@ -422,7 +445,7 @@ export default function Episodes() {
 
     const result = await response.json();
     const episodes = result.results as { [key: string]: any }[]; // later replace any with EpisodeType
-    if (episodes[0].kind === "podcast") {
+    if (episodes && episodes.length && episodes[0].kind === "podcast") {
       updatePodcastShort(episodes[0] as PodcastShortType);
     }
     updateEpisodes(episodes);

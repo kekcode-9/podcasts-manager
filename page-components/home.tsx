@@ -12,6 +12,7 @@ import { PodcastType } from "@/types";
 import ROUTE_CONSTANTS from "@/constants/routeConstants";
 import API_CONSTANTS from "@/constants/apiConstants";
 import Loaders from "@/common-components/loaders";
+import Sort from "@/assets/icons/sort-icon";
 
 const { ROUTES, QUERY_PARAMS_FRONTEND } = ROUTE_CONSTANTS;
 const { EPISODES } = ROUTES;
@@ -114,6 +115,7 @@ export default function Home() {
   const [searchResults, updateSearchResults] =
     useState<{ [key: string]: any }[]>();
   const [showLoader, toggleShowLoader] = useState<boolean>(false);
+  const [message, setMessage] = useState<String | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -121,6 +123,7 @@ export default function Home() {
   const onSearch = async (searchString: string | undefined) => {
     if (searchString !== undefined) {
       toggleShowLoader(true);
+      setMessage(null);
       // make the api call
       const searchParam = searchString.replaceAll(" ", "+");
 
@@ -128,7 +131,7 @@ export default function Home() {
         `${process.env.NEXT_PUBLIC_BASE_URL}${PROXY_SEARCH}?` +
           new URLSearchParams({
             [`${QUERY}`]: searchParam,
-            [`${ORDERING}`]: "oldest",
+            [`${ORDERING.key}`]: ORDERING.values.OLDEST,
           }),
         {
           method: "GET",
@@ -137,9 +140,12 @@ export default function Home() {
 
       const result = await response.json();
       const collections = result.results as { [key: string]: PodcastType }[];
+      toggleShowLoader(false);
+      if (!collections.length) {
+        setMessage("No results found");
+      }
 
       router.push(`?${SEARCH}=${searchParam}`);
-      // console.log('collections: ', collections);
       updateSearchResults(collections);
     }
   };
@@ -183,13 +189,18 @@ export default function Home() {
               w-fit h-fit
               py-2 px-3 bg-[#000000] rounded-full"
             >
-              <Dropdown onSelect={() => {}} dropdownList={[]} />
-              <div
-                className="filter-icon-wrapper
-                flex items-center gap-1"
+              <Dropdown onSelect={() => {}} 
+                dropdownList={[]} 
               >
-                <Filter /> <span>Filter</span>
-              </div>
+                <>
+                  <Sort /> <span>Sort</span>
+                </>
+              </Dropdown>
+              <Dropdown onSelect={() => {}} dropdownList={[]} >
+                <>
+                  <Filter /> <span>Filter</span>
+                </>
+              </Dropdown>
             </div>
           </div>
         ) : (
@@ -227,7 +238,7 @@ export default function Home() {
               })}
             </div>
           ) : (
-            showLoader && (
+            showLoader ? (
               <div
                 className="search-results
               flex flex-col gap-4 sm:gap-8"
@@ -243,6 +254,10 @@ export default function Home() {
                     />
                   );
                 })}
+              </div>
+            ) : (
+              <div className="text-snow">
+                {message}
               </div>
             )
           )
