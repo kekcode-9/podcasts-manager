@@ -1,10 +1,12 @@
-export default {
+const STRING_LITERALS = {
     SORT_ATTRIBUTES: {
-        NEWEST: "newest first",
-        OLDEST: "oldest first",
-        MOST_TRACKS: "most tracks first",
+        NEWEST: "Newest first",
+        OLDEST: "Oldest first",
+        MOST_TRACKS: "Most tracks first",
     },
     FILTER_ATTRIBUTES: {
-        RATING: "rating"
+        RATING_INDEX: "Rating"
     }
 }
+
+export default STRING_LITERALS

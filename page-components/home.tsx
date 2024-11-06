@@ -11,6 +11,7 @@ import { PlayButton } from "@/common-components/cta";
 import { PodcastType } from "@/types";
 import ROUTE_CONSTANTS from "@/constants/routeConstants";
 import API_CONSTANTS from "@/constants/apiConstants";
+import STRING_LITERALS from "@/constants/stringLiterals";
 import Loaders from "@/common-components/loaders";
 import Sort from "@/assets/icons/sort-icon";
 
@@ -20,7 +21,9 @@ const { SEARCH, COLLECTION_ID } = QUERY_PARAMS_FRONTEND;
 
 const { PROXY_API_ROUTES, QUERY_PARAMS } = API_CONSTANTS;
 const { PROXY_SEARCH } = PROXY_API_ROUTES;
-const { QUERY, ORDERING } = QUERY_PARAMS;
+const { QUERY, ORDERING, ATTRIBUTES } = QUERY_PARAMS;
+
+const { SORT_ATTRIBUTES, FILTER_ATTRIBUTES } = STRING_LITERALS;
 
 type PodcastCardPropsType = {
   podcast: PodcastType;
@@ -111,6 +114,10 @@ function PodcastCard({ podcast }: PodcastCardPropsType) {
   );
 }
 
+const queryString: {
+  [x: string]: string | String;
+} = {};
+
 export default function Home() {
   const [searchResults, updateSearchResults] =
     useState<{ [key: string]: any }[]>();
@@ -120,19 +127,34 @@ export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const onSearch = async (searchString: string | undefined) => {
-    if (searchString !== undefined) {
+  const onSearch = async (
+    searchString: string | undefined,
+    ordering?: String | undefined,
+    filterAttr?: String | undefined
+  ) => {
+    if (searchString || queryString.query) {
       toggleShowLoader(true);
       setMessage(null);
       // make the api call
-      const searchParam = searchString.replaceAll(" ", "+");
 
+      const searchParam =
+        searchString || queryString.query
+          ? (searchString || queryString.query).replaceAll(" ", "+")
+          : "";
+      if (searchString) {
+        queryString[`${QUERY}`] = searchParam;
+      }
+      if (ordering) {
+        queryString[`${ORDERING.key}`] = ordering;
+      }
+      if (filterAttr) {
+        queryString[`${ATTRIBUTES.key}`] = filterAttr;
+      }
+
+      console.log("making api call to backend with: ", queryString);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}${PROXY_SEARCH}?` +
-          new URLSearchParams({
-            [`${QUERY}`]: searchParam,
-            [`${ORDERING.key}`]: ORDERING.values.OLDEST,
-          }),
+          new URLSearchParams(queryString as Record<string, string>),
         {
           method: "GET",
         }
@@ -189,18 +211,26 @@ export default function Home() {
               w-fit h-fit
               py-2 px-3 bg-[#000000] rounded-full"
             >
-              <Dropdown onSelect={() => {}} 
-                dropdownList={[]} 
+              <Dropdown
+                onSelect={(key: keyof typeof ORDERING.values) => {
+                  onSearch(undefined, ORDERING.values[key]);
+                }}
+                dropdownList={SORT_ATTRIBUTES}
               >
                 <>
                   <Sort /> <span>Sort</span>
                 </>
               </Dropdown>
-              <Dropdown onSelect={() => {}} dropdownList={[]} >
+              {/* <Dropdown 
+                onSelect={(key: keyof typeof ATTRIBUTES.values) => {
+                  onSearch(undefined, undefined, ATTRIBUTES.values[key]);
+                }} 
+                dropdownList={FILTER_ATTRIBUTES}
+              >
                 <>
                   <Filter /> <span>Filter</span>
                 </>
-              </Dropdown>
+              </Dropdown> */}
             </div>
           </div>
         ) : (
@@ -237,29 +267,26 @@ export default function Home() {
                 );
               })}
             </div>
-          ) : (
-            showLoader ? (
-              <div
-                className="search-results
+          ) : showLoader ? (
+            <div
+              className="search-results
               flex flex-col gap-4 sm:gap-8"
-              >
-                {new Array(10).fill("").map((item, i) => {
-                  return (
-                    <Loaders
-                      loader={{
-                        loaderType: "card",
-                        classNames:
-                          "w-[20rem] sm:w-[32rem] h-[5rem] sm:h-[7rem] rounded-md",
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-snow">
-                {message}
-              </div>
-            )
+            >
+              {new Array(10).fill("").map((item, i) => {
+                return (
+                  <Loaders
+                    key={i}
+                    loader={{
+                      loaderType: "card",
+                      classNames:
+                        "w-[20rem] sm:w-[32rem] h-[5rem] sm:h-[7rem] rounded-md",
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-snow">{message}</div>
           )
         }
       </div>

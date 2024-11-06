@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import API_CONSTANTS from "@/constants/apiConstants";
 
 const { PODCASTS_SEARCH, QUERY_PARAMS } = API_CONSTANTS;
-const { QUERY, ORDERING } = QUERY_PARAMS;
+const { QUERY, ORDERING, ATTRIBUTES } = QUERY_PARAMS;
 
 let cachedResponse = {};
 let cachedQuery = "";
@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const searchString = searchParams.get(QUERY);
   const ordering = searchParams.get(ORDERING.key);
+  const rating = searchParams.get(ATTRIBUTES.key);
 
   const query = `${QUERY}=${searchString}&${ORDERING.key}=${ordering}`;
   if (query === cachedQuery && cachedResponse) {
